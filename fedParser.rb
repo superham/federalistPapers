@@ -1,5 +1,6 @@
+# Alex Kaariainen Fed Papers Project
 require 'erb'
-
+# --------------------------------------------------------
 # ------------------- federalist class -------------------
 class Fed
   def initialize(name, number, title, pub, text)
@@ -10,34 +11,18 @@ class Fed
     @text = text
   end
 
-  #mutators
-  def add_data(name, number, title, pub, text)
-    @author = author
-    @number = number
-    @title = title
-    @pub = pub
-    @text = text
-  end
-
-  def get_author()
-    return @author
-  end
-  def get_number()
-    return @number
-  end
-  def get_title()
-    return @title
-  end
-  def get_pub()
-    return @pub
-  end
-  def get_text()
-    return @text
-  end
+  # getters
+  def get_author() return @author end
+  def get_number() return @number end
+  def get_title() return @title end
+  def get_pub() return @pub end
+  def get_text() return @text end
 end
-# ------------------- end of class -------------------
+# ------------------- end of Fed class -------------------
+# --------------------------------------------------------
 
-# ---------------- methods -----------------
+# --------------------------------------------------------
+# ---------------- local methods -------------------------
 def get_number(line)  # checks string for number
   line.match(/\d+/) # /any number/
 end
@@ -153,22 +138,21 @@ while cond == true
     return returnStr
   end
 end
-
   return returnStr
 end
 # ---------------- end of methods -----------------
+# -------------------------------------------------
 
-# ---------------- start of logic -----------------
+# -------------------------------------------------
+# ---------------start of main program ------------
 
-# array to hold file individual lines in
-lines = Array.new
+lines = Array.new # array to hold the file's lines in
 
-# puts each line from file into 'lines' array
-File.readlines("fed.txt").each do |line|
+File.readlines("fed.txt").each do |line|  # puts each line from file into 'lines' array
   lines.push(line)
 end
 
-fedObjs = Array.new
+fedObjs = Array.new # create an array of Fed objects, each elemet will represent a letter
 count=0
 lines.each_with_index {# go through 'lines' array line by line
   |item,index|
@@ -181,20 +165,34 @@ lines.each_with_index {# go through 'lines' array line by line
     fedObjs[count] = Fed.new(author, number, title, pub, text)
     count += 1
   end
-} # end of loop
+}
 
-# instance variables for erb
-@number = fedObjs[0].get_number()
-@author = fedObjs[0].get_author()
-@title = fedObjs[0].get_title()
-@pub = fedObjs[0].get_pub()
+fileHtml = File.new("output.html","w+")
+fileHtml.puts "<html>
+  <head><title>Federalist Index</title></head>
+  <body>"
+fileHtml.puts "<h3>Federalist Index</h3>
+<table>
+  <tr>
+    <th>No.</th>
+    <th>Author</th>
+    <th>Title</th>
+    <th>Pub</th>
+  </tr>"
 
-# render template
-template = File.read('./template.html.erb')
-result = ERB.new(template).result(binding)
-
-# write result to file
-File.open('output.html', 'w+') do |f|
-  f.write result
-end
-# ------------------- end of logic -------------------
+  # put each fed data into an html table row
+  fedObjs.each_with_index {
+    |item,index|
+    fileHtml.puts "<tr><td>"
+    fileHtml.puts  fedObjs[index].get_number().to_s
+    fileHtml.puts  "</td><td>"
+    fileHtml.puts  fedObjs[index].get_author().to_s
+    fileHtml.puts  "</td><td>"
+    fileHtml.puts  fedObjs[index].get_title().to_s
+    fileHtml.puts  "</td><td>"
+    fileHtml.puts  fedObjs[index].get_pub().to_s
+    fileHtml.puts  "</td></tr>"
+  }
+  fileHtml.puts "</table></body></html>" #end the html doc <-- actully not necessary
+  # --------------------end of main program-----------------
+  # --------------------------------------------------------
